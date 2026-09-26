@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sunshine T Academy | Wireshark Lab</title>
+<style>
+:root{
+  --bg:#07111f; --panel:#0d1b2d; --panel2:#11243a; --text:#f4f8ff;
+  --muted:#a9bdd3; --cyan:#39d9ff; --yellow:#ffd166; --green:#57e389;
+  --red:#ff6b6b; --purple:#a78bfa; --line:#23405e;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,"Segoe UI",Arial,sans-serif;background:
+radial-gradient(circle at 80% 0%,#123b58 0,transparent 32%),var(--bg);color:var(--text);line-height:1.7}
+header{padding:30px 6%;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(7,17,31,.94);backdrop-filter:blur(12px);z-index:10}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--cyan),#5b7cff);display:grid;place-items:center;font-size:28px;box-shadow:0 0 30px #39d9ff33}
+h1{margin:0;font-size:clamp(24px,4vw,42px)} h2{font-size:27px;margin-top:0} h3{margin:8px 0}
+.badge{display:inline-block;padding:4px 12px;border-radius:99px;background:#17304a;color:var(--cyan);font-weight:700;font-size:13px}
+.hero{padding:55px 6% 30px;max-width:1200px;margin:auto}.hero p{font-size:18px;color:var(--muted);max-width:850px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{background:linear-gradient(180deg,var(--panel),#0a1727);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 12px 35px #0003}
+.step{margin:25px auto;max-width:1200px;padding:0 6%}
+.num{width:42px;height:42px;border-radius:13px;background:var(--cyan);color:#04101b;display:inline-grid;place-items:center;font-weight:900;margin-left:10px}
+.callout{border-right:4px solid var(--yellow);background:#201d12;padding:14px 18px;border-radius:12px;color:#fff4c8}
+.safe{border-right:4px solid var(--green);background:#10251b;padding:14px 18px;border-radius:12px}
+.warn{border-right:4px solid var(--red);background:#291516;padding:14px 18px;border-radius:12px}
+code,.filter{direction:ltr;display:inline-block;background:#050b13;border:1px solid #29415b;color:#7de8ff;padding:5px 10px;border-radius:8px;font-family:Consolas,monospace;font-weight:700}
+.filterbox{display:flex;gap:10px;align-items:center;background:#06101c;padding:12px;border:1px solid var(--line);border-radius:12px}
+.filterbox input{flex:1;background:#0e2033;color:white;border:1px solid #35516c;border-radius:8px;padding:12px;font-family:Consolas;font-size:16px;direction:ltr}
+button{border:0;border-radius:10px;padding:10px 16px;font-weight:800;cursor:pointer;background:var(--cyan);color:#04101b}
+button.secondary{background:#20364e;color:white}
+button:active{transform:translateY(1px)}
+.mock{background:#111923;border:2px solid #34485c;border-radius:15px;overflow:hidden;direction:ltr;box-shadow:0 15px 45px #0005}
+.mockbar{background:#1c2733;padding:8px 12px;color:#bcd0e4;font:12px Consolas}
+.mocktop{padding:10px;background:#0d151d;border-bottom:1px solid #304151;color:#a8bdce;font:13px Consolas}
+.packets{font:12px Consolas;min-height:210px;overflow:auto}
+.row{display:grid;grid-template-columns:55px 75px 1fr 1fr 90px;gap:8px;padding:6px 9px;border-bottom:1px solid #202c37;align-items:center}
+.row.head{background:#1d2c3a;color:#d9edf9;font-weight:bold}.row.dns{background:#173b48}.row.tcp{background:#202d4c}.row.udp{background:#273c2b}
+.tag{font-weight:bold}.dns .tag{color:#66e6ff}.tcp .tag{color:#9db7ff}.udp .tag{color:#8df0a0}
+.details{padding:15px;background:#0b131b;color:#b8ccdc;font:12px Consolas;min-height:150px}
+.highlight{outline:3px solid var(--yellow);outline-offset:-3px;animation:pulse 1.5s infinite}
+@keyframes pulse{50%{outline-color:transparent}}
+.arrow{font-size:25px;color:var(--yellow);text-align:center;margin:8px}
+.checklist label{display:block;background:#0b1928;border:1px solid var(--line);padding:10px 14px;border-radius:10px;margin:8px 0;cursor:pointer}
+.checklist input{accent-color:var(--green);transform:scale(1.2);margin-left:8px}
+.quiz button{margin:5px}.result{margin-top:10px;font-weight:800}
+.progress{height:7px;background:#172b40}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:.3s}
+footer{text-align:center;padding:45px 20px;color:var(--muted)}
+@media(max-width:650px){.row{grid-template-columns:45px 65px 1fr 1fr 70px;font-size:10px}.hero{padding-top:35px}.step{padding:0 4%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">🦈</div>
+    <div><span class="badge">Sunshine T Academy • Cyber Security Level 2</span><h1>Wireshark Lab — شوف الشبكة بعينك</h1></div>
+  </div>
+  <div class="progress"><div id="bar"></div></div>
+</header>
+
+<section class="hero">
+  <span class="badge">المحاضرة: Network Traffic Analysis</span>
+  <h2>من أول فتح Wireshark لحد أول Network Detective Challenge 🔎</h2>
+  <p>صفحة عملية مصممة بحيث الطالب الصغير يقرأ الخطوة، ينفذها على جهازه، ثم يجيب سؤالًا بسيطًا. الهدف: فهم Packet + Protocol + Source + Destination، وليس حفظ برنامج كامل.</p>
+  <div class="grid">
+    <div class="card"><h3>📦 Packet</h3><p>جزء صغير من البيانات يتحرك في الشبكة.</p></div>
+    <div class="card"><h3>📡 Protocol</h3><p>قواعد وطريقة التواصل بين الأجهزة.</p></div>
+    <div class="card"><h3>➡️ Source</h3><p>المرسل.</p></div>
+    <div class="card"><h3>🎯 Destination</h3><p>المستقبل.</p></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">0</span>قاعدة الأمان قبل البداية</h2>
+    <div class="safe"><b>🛡️ نحلل Traffic نملك حق تحليله فقط.</b><br>استخدم Wireshark على جهازك أو داخل Lab مصرح به. لا تحاول مراقبة أجهزة أشخاص آخرين أو شبكات لا تملك إذنًا بتحليلها.</div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">1</span>افتح Wireshark</h2>
+    <ol>
+      <li>افتح برنامج <b>Wireshark</b>.</li>
+      <li>ستظهر قائمة باسم <b>Network Interfaces</b>.</li>
+      <li>لو جهازك متصل بالـWi‑Fi اختر <b>Wi‑Fi</b>.</li>
+      <li>لو متصل بكابل اختر <b>Ethernet</b>.</li>
+    </ol>
+    <div class="callout"><b>💡 علامة مفيدة:</b> الـInterface المستخدم عادة يظهر عليه حركة أرقام/Packets. اختَر الواجهة التي تستخدمها فعليًا.</div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">2</span>ابدأ Capture</h2>
+    <ol>
+      <li>اضغط مرتين على <b>Wi‑Fi</b> أو <b>Ethernet</b>.</li>
+      <li>انتظر عدة ثوانٍ.</li>
+      <li>ستبدأ الصفوف بالظهور.</li>
+      <li>بعدها اضغط زر <b>Stop</b> 🟥.</li>
+    </ol>
+    <div class="arrow">⬇️ شكل الشاشة التي نريد أن نتعلم قراءتها</div>
+    <div class="mock">
+      <div class="mockbar">Wireshark — Capture</div>
+      <div class="mocktop">File &nbsp; Edit &nbsp; View &nbsp; Capture &nbsp; Analyze &nbsp; Statistics</div>
+      <div class="packets">
+        <div class="row head"><span>No.</span><span>Time</span><span>Source</span><span>Destination</span><span>Protocol</span></div>
+        <div class="row dns"><span>1</span><span>0.001</span><span>192.168.1.10</span><span>192.168.1.1</span><span class="tag">DNS</span></div>
+        <div class="row tcp"><span>2</span><span>0.014</span><span>192.168.1.10</span><span>93.184.216.34</span><span class="tag">TCP</span></div>
+        <div class="row udp"><span>3</span><span>0.020</span><span>192.168.1.1</span><span>192.168.1.10</span><span class="tag">UDP</span></div>
+      </div>
+      <div class="details"><b>Packet Details</b><br>Frame<br>Ethernet II<br>Internet Protocol<br>UDP / DNS<br><br>👈 لا تحتاج قراءة كل السطور الآن. ركز على Protocol + Source + Destination.</div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">3</span>افهم 3 أجزاء فقط من الشاشة</h2>
+    <div class="grid">
+      <div class="card"><h3>1️⃣ Packet List</h3><p>قائمة بالـPackets التي التقطها Wireshark.</p></div>
+      <div class="card"><h3>2️⃣ Packet Details</h3><p>تفاصيل الـPacket التي اخترتها.</p></div>
+      <div class="card"><h3>3️⃣ Packet Bytes</h3><p>عرض منخفض المستوى للبيانات. <b>مش مطلوب نفصله اليوم.</b></p></div>
+    </div>
+    <div class="callout">🎯 في محاضرة اليوم: لا تخاف من الشاشة. نحن نبحث فقط عن <b>Protocol / Source / Destination</b>.</div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">4</span>اعمل Traffic بسيط</h2>
+    <p>بعد بدء Capture، نفّذ نشاطًا عاديًا على جهازك، مثل فتح موقع عام. ثم ارجع إلى Wireshark واضغط <b>Stop</b>.</p>
+    <div class="warn"><b>⚠️ لا تدخل كلمات مرور أو بيانات خاصة أثناء التجربة.</b> الهدف هو رؤية أنواع الاتصال، وليس البحث عن معلومات شخصية.</div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">5</span>أول Filter: DNS</h2>
+    <p>في أعلى Wireshark ستجد خانة <b>Display Filter</b>.</p>
+    <div class="filterbox">
+      <input id="filter" value="dns" aria-label="Display filter">
+      <button onclick="showFilter('dns')">تطبيق</button>
+    </div>
+    <p>اكتب بالضبط:</p><div class="filter">dns</div>
+    <ol>
+      <li>اضغط داخل Display Filter.</li>
+      <li>اكتب <code>dns</code>.</li>
+      <li>اضغط <b>Enter</b>.</li>
+      <li>ستظهر Packets التي تطابق DNS.</li>
+    </ol>
+    <div class="mock">
+      <div class="mockbar">Display Filter: dns</div>
+      <div class="packets">
+        <div class="row head"><span>No.</span><span>Time</span><span>Source</span><span>Destination</span><span>Protocol</span></div>
+        <div class="row dns highlight"><span>21</span><span>1.235</span><span>192.168.1.10</span><span>192.168.1.1</span><span class="tag">DNS</span></div>
+        <div class="row dns"><span>22</span><span>1.241</span><span>192.168.1.1</span><span>192.168.1.10</span><span class="tag">DNS</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">6</span>يعني إيه DNS؟</h2>
+    <p><b>DNS</b> يساعد الأجهزة على تحويل أسماء المواقع إلى عناوين IP يمكن للشبكة استخدامها.</p>
+    <div class="grid">
+      <div class="card"><h3>👦 أنت</h3><p>تقول: أريد موقعًا اسمه <b>example.com</b>.</p></div>
+      <div class="card"><h3>📖 DNS</h3><p>يساعد في العثور على عنوان IP المرتبط بالاسم.</p></div>
+      <div class="card"><h3>🖥️ الاتصال</h3><p>بعدها يمكن للجهاز التواصل مع العنوان المناسب.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">7</span>اقرأ Packet واحدة</h2>
+    <ol>
+      <li>اضغط على Packet من القائمة.</li>
+      <li>ابحث عن عمود <b>Protocol</b>.</li>
+      <li>اقرأ <b>Source</b>.</li>
+      <li>اقرأ <b>Destination</b>.</li>
+    </ol>
+    <div class="callout"><b>مثال:</b> Source = 192.168.1.10 → Destination = 192.168.1.1 → Protocol = DNS</div>
+    <p>المعنى البسيط: جهاز أرسل Traffic إلى جهاز/خدمة أخرى، ونوع الاتصال الظاهر هنا DNS.</p>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">8</span>جرّب TCP</h2>
+    <p>امسح الفلتر السابق واكتب:</p>
+    <div class="filter">tcp</div>
+    <div class="filterbox">
+      <input value="tcp" aria-label="TCP filter">
+      <button class="secondary" onclick="alert('في Wireshark الحقيقي: اكتب tcp في Display Filter ثم اضغط Enter.')">شرح</button>
+    </div>
+    <p>الفكرة المطلوبة اليوم: <b>TCP</b> أحد بروتوكولات نقل البيانات، ويهتم بالاتصال الموثوق بين الطرفين.</p>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2><span class="num">9</span>جرّب UDP</h2>
+    <p>اكتب في Display Filter:</p>
+    <div class="filter">udp</div>
+    <p>الفكرة المطلوبة اليوم: <b>UDP</b> بروتوكول نقل أبسط وأخف من TCP ولا يعمل بنفس طريقة TCP في ضمان التسليم.</p>
+    <div class="callout">🎯 مش مطلوب تحفظ كل تفاصيل TCP وUDP الآن. المطلوب تعرف إنهما Protocols مختلفة وتعرف كيف تبحث عنها في Wireshark.</div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2>🕵️ Network Detective Challenge</h2>
+    <p><b>نفّذ وحدك:</b></p>
+    <div class="checklist">
+      <label><input type="checkbox"> فتحت Wireshark واخترت الـInterface الصحيح.</label>
+      <label><input type="checkbox"> بدأت Capture ثم أوقفتها.</label>
+      <label><input type="checkbox"> وجدت Packet واحدة على الأقل.</label>
+      <label><input type="checkbox"> عرفت الـProtocol.</label>
+      <label><input type="checkbox"> عرفت الـSource.</label>
+      <label><input type="checkbox"> عرفت الـDestination.</label>
+      <label><input type="checkbox"> استخدمت Filter باسم <code>dns</code>.</label>
+      <label><input type="checkbox"> استخدمت Filter باسم <code>tcp</code>.</label>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card quiz">
+    <h2>🎮 اختبار سريع</h2>
+    <p><b>1) Wireshark يستخدم أساسًا في:</b></p>
+    <button onclick="answer(this,true)">تحليل Network Traffic</button>
+    <button class="secondary" onclick="answer(this,false)">تصميم الصور</button>
+    <div id="r1" class="result"></div>
+    <p><b>2) Packet هي:</b></p>
+    <button onclick="answer2(this,false)">جهاز كمبيوتر</button>
+    <button onclick="answer2(this,true)">جزء من البيانات</button>
+    <div id="r2" class="result"></div>
+    <p><b>3) ما Filter الذي نستخدمه للبحث عن DNS؟</b></p>
+    <button onclick="answer3(this,true)">dns</button>
+    <button onclick="answer3(this,false)">wifi</button>
+    <div id="r3" class="result"></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2>🔗 نربط المحاضرة السابقة بالنهارده</h2>
+    <div class="grid">
+      <div class="card"><h3>🔎 Nmap</h3><p><b>What is available?</b><br>يساعدنا في التعرف على الأجهزة/المنافذ/الخدمات داخل Lab مصرح به.</p></div>
+      <div class="card"><h3>🦈 Wireshark</h3><p><b>What is happening?</b><br>يساعدنا على رؤية وتحليل Network Traffic.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2>📌 ملخص المحاضرة</h2>
+    <p>إذا قدرت تقول الجمل التالية، فأنت نجحت:</p>
+    <ul>
+      <li><b>Wireshark</b> = Network Traffic Analyzer.</li>
+      <li><b>Packet</b> = جزء من البيانات.</li>
+      <li><b>Protocol</b> = قواعد/طريقة الاتصال.</li>
+      <li><b>Source</b> = المرسل.</li>
+      <li><b>Destination</b> = المستقبل.</li>
+      <li><b>dns</b> = Display Filter للبحث عن DNS Traffic.</li>
+    </ul>
+    <div class="safe"><b>🔐 القاعدة الذهبية:</b><br>Analyze only traffic you are allowed to analyze.</div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="card">
+    <h2>🏠 مهمة بعد المحاضرة</h2>
+    <p>على جهازك فقط: افتح Wireshark، نفّذ Capture قصيرًا أثناء استخدامك العادي، ثم جرّب Filters بسيطة، وسجّل <b>3 Protocols</b> وجدتها.</p>
+    <div class="callout">لا تسجل أو تشارك بيانات شخصية أو كلمات مرور. نحن نتعلم تحليل الشبكات، وليس جمع أسرار.</div>
+  </div>
+</section>
+
+<footer>
+  <b>Sunshine T Academy</b><br>
+  بنحوّل الحلم لكود ☀️ • Cyber Security Level 2
+</footer>
+
+<script>
+function showFilter(v){
+  document.getElementById('filter').value=v;
+}
+function answer(btn,ok){document.getElementById('r1').textContent=ok?'✅ ممتاز!':'❌ جرّب مرة أخرى.'}
+function answer2(btn,ok){document.getElementById('r2').textContent=ok?'✅ ممتاز!':'❌ جرّب مرة أخرى.'}
+function answer3(btn,ok){document.getElementById('r3').textContent=ok?'✅ صحيح!':'❌ جرّب مرة أخرى.'}
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-innerHeight;
+  document.getElementById('bar').style.width=(scrollY/h*100)+'%';
+});
+</script>
+</body>
+</html>
